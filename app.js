@@ -5,14 +5,18 @@ let indice = 0;
 let puntos = 0;
 let inicio = 0;
 let respondida = false;
+let rachaActual = 0;
+let mejorRacha = 0;
 
 /* ---------- Usuario y apariencia ---------- */
 function pedirNombre() {
-  return prompt("¿Cómo te llamas?").trim() || "invitado";
+  // Error 1 corregido: Cancelar prompt devuelve null; se usa una cadena vacía para evitar llamar trim() sobre null.
+  return (prompt("¿Cómo te llamas?") || "").trim() || "invitado";
 }
 
 function aplicarTema() {
-  document.body.class = usuario.tema === "oscuro" ? "oscuro" : "";
+  // Error 2 corregido: classList modifica la clase CSS del body; asignar body.class no la aplicaba.
+  document.body.classList.toggle("oscuro", usuario.tema === "oscuro");
 }
 
 function cambiarTema() {
@@ -24,9 +28,11 @@ function cambiarTema() {
 /* ---------- Datos del navegador ---------- */
 function datosDelNavegador() {
   return {
-    ventana: document.innerWidth + " × " + document.innerHeight,
+    // Error 3 corregido: el tamaño de la ventana se obtiene de window, no de document.
+    ventana: window.innerWidth + " × " + window.innerHeight,
     idioma: navigator.language,
-    pagina: window.title,
+    // Error 4 corregido: el título de la pestaña está en document.title.
+    pagina: document.title,
     ruta: location.pathname
   };
 }
@@ -42,7 +48,8 @@ function elegirPreguntas(todas, cuantas) {
   const disponibles = [...todas];
   const elegidas = [];
   while (elegidas.length < Math.min(cuantas, todas.length)) {
-    const posicion = Math.floor(Math.random() * disponibles.length) + 1;
+    // Error 5 corregido: los índices empiezan en cero; sumar 1 podía extraer undefined.
+    const posicion = Math.floor(Math.random() * disponibles.length);
     elegidas.push(disponibles.splice(posicion, 1)[0]);
   }
   return elegidas;
@@ -57,7 +64,9 @@ function iniciarPartida() {
   preguntas = elegirPreguntas(PREGUNTAS, 5);
   indice = 0;
   puntos = 0;
+  // La racha y el récord se conservan entre partidas; solo una respuesta incorrecta rompe la racha.
   inicio = Date.now();
+  pintarRacha();
   mostrarSeccion("inicio", false);
   mostrarSeccion("final", false);
   mostrarSeccion("juego", true);
@@ -92,12 +101,35 @@ function manejarOpcion(evento) {
   responder(dato);
 }
 
+function pintarRacha() {
+  document.getElementById("rachaActual").textContent = rachaActual;
+  document.getElementById("mejorRacha").textContent = mejorRacha;
+  // El estilo destacado se activa cuando el jugador consigue al menos dos aciertos seguidos.
+  document.getElementById("btnRacha").classList.toggle("racha-activa", rachaActual >= 2);
+}
+
+function alternarDetalleRacha() {
+  const boton = document.getElementById("btnRacha");
+  const detalle = document.getElementById("detalleRacha");
+  detalle.hidden = !detalle.hidden;
+  boton.setAttribute("aria-expanded", String(!detalle.hidden));
+}
+
 function responder(i) {
   respondida = true;
   const q = preguntas[indice];
   const botones = document.getElementById("opciones").children;
+  // Error 6 corregido: dataset.i es texto y correcta es número; se convierten al mismo tipo antes de comparar.
+  i = Number(i);
   const acierto = i === q.correcta;
-  if (acierto) puntos++;
+  if (acierto) {
+    puntos++;
+    rachaActual++;
+    mejorRacha = Math.max(mejorRacha, rachaActual);
+  } else {
+    rachaActual = 0;
+  }
+  pintarRacha();
 
   botones[q.correcta].className = "opcion ok";
   if (!acierto) botones[i].className = "opcion mal";
@@ -124,7 +156,9 @@ function terminar() {
   mostrarSeccion("juego", false);
   mostrarSeccion("final", true);
   document.title = "QuizDAW";
-  document.getElementById("textoFinal").textContent = partida.resumen();
+  // Se añade el mejor tramo de aciertos seguidos al resumen de la partida.
+  document.getElementById("textoFinal").textContent =
+    partida.resumen() + " · Mejor racha: " + mejorRacha;
   pintarPartidas();
 }
 
@@ -143,7 +177,8 @@ function pintarPartidas() {
 }
 
 function abrirResultados() {
-  window.open("resultado.html", "resultados", "popup=yes,width=520,height=460");
+  // Error 7 corregido: el archivo de la ventana se llama resultados.html.
+  window.open("resultados.html", "resultados", "popup=yes,width=520,height=460");
 }
 
 function manejarBorrar() {
@@ -172,7 +207,9 @@ function iniciar() {
   document.getElementById("btnSiguiente").addEventListener("click", siguiente);
   document.getElementById("opciones").addEventListener("click", manejarOpcion);
   document.getElementById("btnTema").addEventListener("click", cambiarTema);
-  document.getElementById("btnResultados").addEventListener("click", abrirResultados());
+  // Error 8 corregido: se pasa el manejador, no se ejecuta al cargar la página.
+  document.getElementById("btnResultados").addEventListener("click", abrirResultados);
   document.getElementById("btnBorrar").addEventListener("click", manejarBorrar);
+  document.getElementById("btnRacha").addEventListener("click", alternarDetalleRacha);
 }
 document.addEventListener("DOMContentLoaded", iniciar);

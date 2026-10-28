@@ -3,18 +3,21 @@
 const PREFIJO = "quiz_";
 
 function guardarCookie(nombre, valor, dias) {
-  const segundos = dias * 24 * 60;
-  const texto = JSON.stringify(valor);
+  // Error 9 corregido: max-age usa segundos (no minutos) y el JSON se codifica para guardar caracteres especiales.
+  const segundos = dias * 24 * 60 * 60;
+  const texto = encodeURIComponent(JSON.stringify(valor));
   document.cookie = PREFIJO + nombre + "=" + texto + "; max-age=" + segundos + "; path=/";
 }
 
 function leerCookie(nombre, porDefecto) {
   const clave = PREFIJO + nombre + "=";
-  const trozo = document.cookie.split("; ").find(c => c.startsWith(clave));
+  const trozo = document.cookie.split(/;\s*/).find(c => c.startsWith(clave));
   if (!trozo) return porDefecto;
-  return JSON.parse(trozo.slice(clave.length));
+  // Error 10 corregido: se decodifica el valor antes de convertirlo desde JSON.
+  return JSON.parse(decodeURIComponent(trozo.slice(clave.length)));
 }
 
 function borrarCookie(nombre) {
-  document.cookie = PREFIJO + nombre + "=; max-age=0; path=/quiz";
+  // Error 11 corregido: la ruta debe coincidir con path=/ usado al crear la cookie.
+  document.cookie = PREFIJO + nombre + "=; max-age=0; path=/";
 }

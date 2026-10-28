@@ -20,13 +20,15 @@ class Partida {
 
 function formatearFecha(textoISO) {
   const f = new Date(textoISO);
-  return f.getDate() + "/" + f.getMonth() + "/" + f.getYear();
+  // Error 12 corregido: getMonth empieza en cero y getYear no devuelve el año completo.
+  return f.getDate() + "/" + (f.getMonth() + 1) + "/" + f.getFullYear();
 }
 
 // Las partidas se guardan en una cookie como un array en JSON.
 function cargarPartidas() {
   const datos = leerCookie("partidas", []);
-  return datos;
+  // Error 13 corregido: JSON no conserva métodos; se recrean objetos Partida para usar resumen() y porcentaje().
+  return datos.map(p => new Partida(p.nombre, p.puntos, p.total, p.fecha, p.segundos));
 }
 
 function guardarPartida(partida) {
@@ -36,6 +38,10 @@ function guardarPartida(partida) {
 }
 
 function mediaPuntos(partidas) {
-  if (partidas.length === 0) return 0;
-  return partidas.reduce((suma, p) => suma + p.puntos) / partidas.length;
+  // Error corregido: se excluyen puntuaciones ausentes o no numéricas para que datos antiguos no conviertan la media en NaN.
+  const puntosValidos = partidas
+    .filter(p => p && p.puntos !== null && p.puntos !== "" && Number.isFinite(Number(p.puntos)))
+    .map(p => Number(p.puntos));
+  if (puntosValidos.length === 0) return 0;
+  return puntosValidos.reduce((suma, puntos) => suma + puntos, 0) / puntosValidos.length;
 }

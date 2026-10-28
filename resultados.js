@@ -1,5 +1,6 @@
 // Ventana de resultados: lee la cookie de partidas que guardó la página principal.
 function pintarResultados() {
+  // Error 13 corregido en partida.js: cargarPartidas reconstruye instancias para que porcentaje() esté disponible aquí.
   const partidas = cargarPartidas();
   const tabla = document.getElementById("tabla");
   tabla.innerHTML = "";

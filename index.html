@@ -24,6 +24,11 @@
   </section>
 
   <section id="juego" class="card" hidden>
+    <!-- Nueva función destacada: el botón muestra la racha actual y el récord de la partida. -->
+    <button type="button" id="btnRacha" class="racha" aria-expanded="false" aria-controls="detalleRacha">
+      🔥 Racha: <span id="rachaActual">0</span> · Récord: <span id="mejorRacha">0</span>
+    </button>
+    <p id="detalleRacha" class="detalle-racha" hidden>La racha aumenta con cada respuesta correcta y vuelve a cero si fallas.</p>
     <h2 id="textoPregunta"></h2>
     <div id="opciones"></div>
     <p id="feedback" class="feedback"></p>

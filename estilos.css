@@ -12,6 +12,13 @@ body.oscuro .muted{color:#93a0b8;}
 body.oscuro .card{background:#171e2e;border-color:#263149;}
 button{padding:9px 16px;background:#2a5fd0;color:#fff;border:none;border-radius:10px;font-weight:600;cursor:pointer;}
 button:hover{filter:brightness(1.1);}
+.racha{display:block;width:100%;margin-bottom:12px;background:#fff2c2;color:#684600;border:2px solid #f0b429;font-size:1rem;text-align:center;box-shadow:0 3px 10px #f0b42944;}
+.racha:hover{filter:brightness(.97);}
+.racha.racha-activa{background:#ffcf4a;border-color:#e29b00;box-shadow:0 0 0 4px #f0b42944,0 4px 14px #e29b0066;transform:scale(1.02);}
+.detalle-racha{margin:-4px 0 12px;padding:8px 10px;border-left:4px solid #f0b429;background:#fff8e2;color:#684600;border-radius:4px;font-size:.9rem;}
+body.oscuro .racha{background:#483718;color:#ffe29a;border-color:#d89d20;}
+body.oscuro .racha.racha-activa{background:#624919;border-color:#ffcb4b;}
+body.oscuro .detalle-racha{background:#332a1a;color:#ffe29a;border-left-color:#ffcb4b;}
 .secundario{background:#5a6785;}
 .peligro{background:#d64545;}
 #opciones{display:grid;gap:8px;margin:12px 0;}
